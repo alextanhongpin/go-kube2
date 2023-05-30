@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-kube # Name of the kubernetes resource.
+  #namespace: kubernetes-dashboard
+spec:
+  replicas: 1 # Only 1 pod running.
+  selector:
+    matchLabels:
+      app: go-kube # This deployment applies to Pods matching the specified label.
+  template: # This deployment will create a set of pods using this template.
+    metadata:
+      labels: # The labels that will be applied to all of the Pods in this deployment.
+        app: go-kube
+    spec: # Spec of the container which will run in the pod.
+      containers:
+      - name: go-kube
+        image: alextanhongpin/go-kube:latest
+        imagePullPolicy: IfNotPresent # Use local image instead of pulling from Container Registry.
+        ports:
+        - containerPort: 8080 # Should match the port number that the Go application listens on.
+        env:
+          - name: PORT
+            value: "8080" # Must be string.
+        livenessProbe: # To check the health of the Pod
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe: # To check if the Pod is ready to serve traffic or not.
+          httpGet:
+            path: /readiness
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1

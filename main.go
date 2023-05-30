@@ -21,6 +21,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler)
+	mux.HandleFunc("/health", handler)
+	mux.HandleFunc("/readiness", handler)
 	server.New(l, mux, port)
 }
 
